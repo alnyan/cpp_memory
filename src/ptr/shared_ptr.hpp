@@ -68,15 +68,6 @@ public:
     }
 
     shared_ptr(const shared_ptr &other) {
-        if constexpr (!Nullable) {
-            if (_refcount->dec() == 0) {
-                deleter(value);
-                delete _refcount;
-                value = nullptr;
-                _refcount = nullptr;
-            }
-        }
-
         _refcount = other._refcount;
         value = other.value;
         _refcount->inc();
@@ -174,6 +165,14 @@ public:
 
     operator bool() {
         return (bool) value;
+    }
+
+    template<typename ... V> static shared_ptr create(const V &... args) {
+        return std::move(shared_ptr(new T(args...)));
+    };
+
+    friend std::ostream &operator <<(std::ostream &o, const shared_ptr &p) {
+        return o << "shared_ptr[" << p.refcount() << "]@" << p.value;
     }
 
 protected:

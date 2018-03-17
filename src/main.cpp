@@ -22,6 +22,18 @@ int main() {
 
         x->method();
 
+        std::cout << "x = " << x << std::endl;
+
+        {
+            std::cout << "Enter scope" << std::endl;
+            shared_ptr x2(x);
+            std::cout << "x = " << x << std::endl;
+            std::cout << "x2 = " << x2 << std::endl;
+            std::cout << "Exit scope" << std::endl;
+        }
+
+        std::cout << "x = " << x << std::endl;
+
         shared_ptr<TestClass, true> p = nullptr;
 
         p->method();
