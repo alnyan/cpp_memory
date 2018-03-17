@@ -7,7 +7,6 @@ class ptr_deleter {
 public:
     template<typename T> void operator()(T *ptr) {
         if constexpr (std::is_array<T>::value) {
-            std::cout << "Array deleter" << std::endl;
             delete []ptr;
         } else {
             delete ptr;
