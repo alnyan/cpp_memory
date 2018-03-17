@@ -1,7 +1,8 @@
 #pragma once
+#include "common.hpp"
 #include <stdexcept>
 
-template<typename T, bool Nullable = false> class ptr {
+template<typename T, bool Nullable = false, typename D = ptr_deleter> class ptr {
 public:
     ptr() {
         static_assert(Nullable, "Trying to empty-initialize non-nullable pointer");
@@ -17,13 +18,17 @@ public:
         value = raw;
     }
 
-    ptr(ptr<T, false> &&other) {
-        static_assert(!Nullable);
-        value = std::move(other.value);
-        other.value = nullptr;
+    ptr(T *raw, D &&d) {
+        if constexpr (!Nullable) {
+            if (!raw) {
+                throw std::logic_error {"Trying to initialize non-nullable pointer with raw null pointer"};
+            }
+        }
+        value = raw;
+        deleter = std::move(d);
     }
 
-    ptr(ptr<T, true> &&other) {
+    ptr(ptr &&other) {
         value = std::move(other.value);
         other.value = nullptr;
     }
@@ -37,7 +42,7 @@ public:
                 return;
             }
         }
-        delete value;
+        deleter(value);
     }
 
     T *operator ->() {
@@ -62,8 +67,8 @@ public:
         return (bool) value;
     }
 
-    template<typename ... V> static ptr<T> create(const V &... args) {
-        return std::move(ptr<T>(new T(args...)));
+    template<typename ... V> static ptr create(const V &... args) {
+        return std::move(ptr(new T(args...)));
     };
 
     friend std::ostream &operator <<(std::ostream &o, const ptr &p) {
@@ -73,4 +78,5 @@ public:
 private:
 
     T *value;
+    D deleter;
 };

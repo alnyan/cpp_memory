@@ -1,18 +1,8 @@
 #pragma once
+#include "common.hpp"
 #include <stdexcept>
 
 template<typename T> class weak_ref;
-
-class ptr_deleter {
-public:
-    template<typename T> void operator()(T *ptr) {
-        if constexpr (std::is_array<T>::value) {
-            delete []ptr;
-        } else {
-            delete ptr;
-        }
-    }
-};
 
 class ptr_ref_count {
 public:

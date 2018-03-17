@@ -10,14 +10,29 @@ public:
     ~TestClass() {
         std::cout << "Destructor " << this << std::endl;
     }
+
+    void method() {
+        std::cout << "TestClass::method" << std::endl;
+    }
 };
 
 int main() {
     try {
         shared_ptr x = new TestClass;
+
+        x->method();
+
         shared_ptr<TestClass, true> p = nullptr;
 
-        *p;
+        p->method();
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    try {
+        ptr x = new TestClass;
+
+        x->method();
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
     }
